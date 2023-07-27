@@ -237,46 +237,46 @@ class ObjectDetectorHelper(
 
     // Runs object detection on live streaming cameras frame-by-frame and returns the results
     // asynchronously to the caller.
-    fun detectLivestreamFrame(imageProxy: ImageProxy) {
-
-        if (runningMode != RunningMode.LIVE_STREAM) {
-            throw IllegalArgumentException(
-                "Attempting to call detectLivestreamFrame" +
-                        " while not using RunningMode.LIVE_STREAM"
-            )
-        }
-
-        val frameTime = SystemClock.uptimeMillis()
-
-        // Copy out RGB bits from the frame to a bitmap buffer
-        val bitmapBuffer =
-            Bitmap.createBitmap(
-                imageProxy.width,
-                imageProxy.height,
-                Bitmap.Config.ARGB_8888
-            )
-        imageProxy.use { bitmapBuffer.copyPixelsFromBuffer(imageProxy.planes[0].buffer) }
-        imageProxy.close()
-        // Rotate the frame received from the camera to be in the same direction as it'll be shown
-        val matrix =
-            Matrix().apply { postRotate(imageProxy.imageInfo.rotationDegrees.toFloat()) }
-
-        val rotatedBitmap =
-            Bitmap.createBitmap(
-                bitmapBuffer,
-                0,
-                0,
-                bitmapBuffer.width,
-                bitmapBuffer.height,
-                matrix,
-                true
-            )
-
-        // Convert the input Bitmap object to an MPImage object to run inference
-        val mpImage = BitmapImageBuilder(rotatedBitmap).build()
-
-        detectAsync(mpImage, frameTime)
-    }
+//    fun detectLivestreamFrame(imageProxy: ImageProxy) {
+//
+//        if (runningMode != RunningMode.LIVE_STREAM) {
+//            throw IllegalArgumentException(
+//                "Attempting to call detectLivestreamFrame" +
+//                        " while not using RunningMode.LIVE_STREAM"
+//            )
+//        }
+//
+//        val frameTime = SystemClock.uptimeMillis()
+//
+//        // Copy out RGB bits from the frame to a bitmap buffer
+//        val bitmapBuffer =
+//            Bitmap.createBitmap(
+//                imageProxy.width,
+//                imageProxy.height,
+//                Bitmap.Config.ARGB_8888
+//            )
+//        imageProxy.use { bitmapBuffer.copyPixelsFromBuffer(imageProxy.planes[0].buffer) }
+//        imageProxy.close()
+//        // Rotate the frame received from the camera to be in the same direction as it'll be shown
+//        val matrix =
+//            Matrix().apply { postRotate(imageProxy.imageInfo.rotationDegrees.toFloat()) }
+//
+//        val rotatedBitmap =
+//            Bitmap.createBitmap(
+//                bitmapBuffer,
+//                0,
+//                0,
+//                bitmapBuffer.width,
+//                bitmapBuffer.height,
+//                matrix,
+//                true
+//            )
+//
+//        // Convert the input Bitmap object to an MPImage object to run inference
+//        val mpImage = BitmapImageBuilder(rotatedBitmap).build()
+//
+//        detectAsync(mpImage, frameTime)
+//    }
 
     // Run object detection using MediaPipe Object Detector API
     @VisibleForTesting
