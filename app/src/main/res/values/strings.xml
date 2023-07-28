@@ -15,13 +15,13 @@
     ~ limitations under the License.
 -->
 <resources>
-    <string name="app_name">MediaPipe Object Detection</string>
+    <string name="app_name">MediaPipe Lite</string>
 
     <string name="alt_bottom_sheet_chevron">Bottom sheet expandable indicator</string>
 
-    <string name="alt_bottom_sheet_max_results_button_minus">Decreasing maxium detected results
+    <string name="alt_bottom_sheet_max_results_button_minus">Decreasing maximum detected results
         button</string>
-    <string name="alt_bottom_sheet_max_results_button_plus">Increasing maxium detected results
+    <string name="alt_bottom_sheet_max_results_button_plus">Increasing maximum detected results
         button</string>
     <string name="alt_bottom_sheet_threshold_button_minus">Decreasing threshold of detected object
         results button</string>
@@ -37,7 +37,7 @@
     <string name="menu_camera">Camera</string>
     <string name="menu_gallery">Gallery</string>
     <string name="tv_gallery_placeholder">Click + to add a video
-        to begin running the object detection.</string>
+        to begin object detection.</string>
 
     <string-array name="delegate_spinner_titles">
         <item>CPU</item>
