@@ -80,6 +80,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     implementation 'androidx.fragment:fragment-ktx:1.5.4'
+    implementation 'androidx.test.ext:junit-ktx:1.1.5'
 
     // Navigation library
     def nav_version = "2.3.5"
