@@ -222,7 +222,7 @@ class ObjectDetectorHelper(
                     )
                 }
         }
-
+        Log.d("Result", resultList.toString())
         retriever.release()
 
         val inferenceTimePerFrameMs =
