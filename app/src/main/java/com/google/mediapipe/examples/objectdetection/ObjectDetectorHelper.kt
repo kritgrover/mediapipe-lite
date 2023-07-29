@@ -86,14 +86,6 @@ class ObjectDetectorHelper(
 
         // Check if runningMode is consistent with objectDetectorListener
         when (runningMode) {
-            RunningMode.LIVE_STREAM -> {
-                if (objectDetectorListener == null) {
-                    throw IllegalStateException(
-                        "objectDetectorListener must be set when runningMode is LIVE_STREAM."
-                    )
-                }
-            }
-            RunningMode.IMAGE,
             RunningMode.VIDEO -> {
                 // no-op
             }
@@ -110,10 +102,6 @@ class ObjectDetectorHelper(
             when (runningMode) {
                 RunningMode.IMAGE,
                 RunningMode.VIDEO -> optionsBuilder.setRunningMode(runningMode)
-                RunningMode.LIVE_STREAM ->
-                    optionsBuilder.setRunningMode(runningMode)
-                        .setResultListener(this::returnLivestreamResult)
-                        .setErrorListener(this::returnLivestreamError)
             }
 
             val options = optionsBuilder.build()
@@ -133,11 +121,6 @@ class ObjectDetectorHelper(
                 "Object detector failed to load model with error: " + e.message
             )
         }
-    }
-
-    // Return running status of recognizer helper
-    fun isClosed(): Boolean {
-        return objectDetector == null
     }
 
     // Accepts the URI for a video file loaded from the user's gallery and attempts to run
@@ -233,118 +216,6 @@ class ObjectDetectorHelper(
         } else {
             ResultBundle(resultList, inferenceTimePerFrameMs, height, width)
         }
-    }
-
-    // Runs object detection on live streaming cameras frame-by-frame and returns the results
-    // asynchronously to the caller.
-//    fun detectLivestreamFrame(imageProxy: ImageProxy) {
-//
-//        if (runningMode != RunningMode.LIVE_STREAM) {
-//            throw IllegalArgumentException(
-//                "Attempting to call detectLivestreamFrame" +
-//                        " while not using RunningMode.LIVE_STREAM"
-//            )
-//        }
-//
-//        val frameTime = SystemClock.uptimeMillis()
-//
-//        // Copy out RGB bits from the frame to a bitmap buffer
-//        val bitmapBuffer =
-//            Bitmap.createBitmap(
-//                imageProxy.width,
-//                imageProxy.height,
-//                Bitmap.Config.ARGB_8888
-//            )
-//        imageProxy.use { bitmapBuffer.copyPixelsFromBuffer(imageProxy.planes[0].buffer) }
-//        imageProxy.close()
-//        // Rotate the frame received from the camera to be in the same direction as it'll be shown
-//        val matrix =
-//            Matrix().apply { postRotate(imageProxy.imageInfo.rotationDegrees.toFloat()) }
-//
-//        val rotatedBitmap =
-//            Bitmap.createBitmap(
-//                bitmapBuffer,
-//                0,
-//                0,
-//                bitmapBuffer.width,
-//                bitmapBuffer.height,
-//                matrix,
-//                true
-//            )
-//
-//        // Convert the input Bitmap object to an MPImage object to run inference
-//        val mpImage = BitmapImageBuilder(rotatedBitmap).build()
-//
-//        detectAsync(mpImage, frameTime)
-//    }
-
-    // Run object detection using MediaPipe Object Detector API
-    @VisibleForTesting
-    fun detectAsync(mpImage: MPImage, frameTime: Long) {
-        // As we're using running mode LIVE_STREAM, the detection result will be returned in
-        // returnLivestreamResult function
-        objectDetector?.detectAsync(mpImage, frameTime)
-    }
-
-    // Return the detection result to this ObjectDetectorHelper's caller
-    private fun returnLivestreamResult(
-        result: ObjectDetectionResult,
-        input: MPImage
-    ) {
-        val finishTimeMs = SystemClock.uptimeMillis()
-        val inferenceTime = finishTimeMs - result.timestampMs()
-
-        objectDetectorListener?.onResults(
-            ResultBundle(
-                listOf(result),
-                inferenceTime,
-                input.height,
-                input.width
-            )
-        )
-    }
-
-    // Return errors thrown during detection to this ObjectDetectorHelper's caller
-    private fun returnLivestreamError(error: RuntimeException) {
-        objectDetectorListener?.onError(
-            error.message ?: "An unknown error has occurred"
-        )
-    }
-
-    // Accepted a Bitmap and runs object detection inference on it to return results back
-    // to the caller
-    fun detectImage(image: Bitmap): ResultBundle? {
-
-        if (runningMode != RunningMode.IMAGE) {
-            throw IllegalArgumentException(
-                "Attempting to call detectImage" +
-                        " while not using RunningMode.IMAGE"
-            )
-        }
-
-        if (objectDetector == null) return null
-
-        // Inference time is the difference between the system time at the start and finish of the
-        // process
-        val startTime = SystemClock.uptimeMillis()
-
-        // Convert the input Bitmap object to an MPImage object to run inference
-        val mpImage = BitmapImageBuilder(image).build()
-
-        // Run object detection using MediaPipe Object Detector API
-        objectDetector?.detect(mpImage)?.also { detectionResult ->
-            val inferenceTimeMs = SystemClock.uptimeMillis() - startTime
-            return ResultBundle(
-                listOf(detectionResult),
-                inferenceTimeMs,
-                image.height,
-                image.width
-            )
-        }
-
-        // If objectDetector?.detect() returns null, this is likely an error. Returning null
-        // to indicate this.
-        return null
     }
 
     // Wraps results from inference, the time it takes for inference to be performed, and
