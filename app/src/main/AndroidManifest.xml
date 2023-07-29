@@ -26,9 +26,6 @@
     <!-- Declare features -->
     <uses-feature android:name="android.hardware.camera" />
 
-    <!-- Declare permissions -->
-    <uses-permission android:name="android.permission.CAMERA" />
-
     <application
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
