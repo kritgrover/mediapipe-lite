@@ -56,8 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/toolbar"
             app:itemIconTint="@color/bg_nav_item"
-            app:itemTextColor="@color/bg_nav_item"
-            app:menu="@menu/menu_bottom_nav" />
+            app:itemTextColor="@color/bg_nav_item"/>
 
         <View
             android:id="@+id/view"
