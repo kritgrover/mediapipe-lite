@@ -62,7 +62,6 @@ class GalleryFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             // Handle the returned Uri
             uri?.let { mediaUri ->
                 when (val mediaType = loadMediaType(mediaUri)) {
-                    MediaType.IMAGE -> runDetectionOnImage(mediaUri)
                     MediaType.VIDEO -> runDetectionOnVideo(mediaUri)
                     MediaType.UNKNOWN -> {
                         updateDisplayView(mediaType)
@@ -201,66 +200,6 @@ class GalleryFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 
         fragmentGalleryBinding.overlay.clear()
         fragmentGalleryBinding.tvPlaceholder.visibility = View.VISIBLE
-    }
-
-    // Load and display the image.
-    private fun runDetectionOnImage(uri: Uri) {
-        setUiEnabled(false)
-        backgroundExecutor = Executors.newSingleThreadScheduledExecutor()
-        updateDisplayView(MediaType.IMAGE)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val source = ImageDecoder.createSource(
-                requireActivity().contentResolver,
-                uri
-            )
-            ImageDecoder.decodeBitmap(source)
-        } else {
-            MediaStore.Images.Media.getBitmap(
-                requireActivity().contentResolver,
-                uri
-            )
-        }
-            .copy(Bitmap.Config.ARGB_8888, true)
-            ?.let { bitmap ->
-                fragmentGalleryBinding.imageResult.setImageBitmap(bitmap)
-
-                // Run object detection on the input image
-                backgroundExecutor.execute {
-
-                    objectDetectorHelper =
-                        ObjectDetectorHelper(
-                            context = requireContext(),
-                            threshold = viewModel.currentThreshold,
-                            currentDelegate = viewModel.currentDelegate,
-                            currentModel = viewModel.currentModel,
-                            maxResults = viewModel.currentMaxResults,
-                            runningMode = RunningMode.IMAGE,
-                            objectDetectorListener = this
-                        )
-
-                    objectDetectorHelper.detectImage(bitmap)
-                        ?.let { resultBundle ->
-                            activity?.runOnUiThread {
-                                fragmentGalleryBinding.overlay.setResults(
-                                    resultBundle.results[0],
-                                    bitmap.height,
-                                    bitmap.width
-                                )
-
-                                setUiEnabled(true)
-                                fragmentGalleryBinding.bottomSheetLayout.inferenceTimeVal.text =
-                                    String.format(
-                                        "%d ms",
-                                        resultBundle.inferenceTime
-                                    )
-                            }
-                        } ?: run {
-                        Log.e(TAG, "Error running object detection.")
-                    }
-
-                    objectDetectorHelper.clearObjectDetector()
-                }
-            }
     }
 
     private fun runDetectionOnVideo(uri: Uri) {
