@@ -17,15 +17,11 @@ package com.google.mediapipe.examples.objectdetection
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Matrix
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.SystemClock
 import android.util.Log
-import androidx.annotation.VisibleForTesting
-import androidx.camera.core.ImageProxy
 import com.google.mediapipe.framework.image.BitmapImageBuilder
-import com.google.mediapipe.framework.image.MPImage
 import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.core.Delegate
 import com.google.mediapipe.tasks.vision.core.RunningMode
@@ -84,13 +80,6 @@ class ObjectDetectorHelper(
 
         baseOptionsBuilder.setModelAssetPath(modelName)
 
-        // Check if runningMode is consistent with objectDetectorListener
-        when (runningMode) {
-            RunningMode.VIDEO -> {
-                // no-op
-            }
-        }
-
         try {
             val optionsBuilder =
                 ObjectDetector.ObjectDetectorOptions.builder()
@@ -102,6 +91,7 @@ class ObjectDetectorHelper(
             when (runningMode) {
                 RunningMode.IMAGE,
                 RunningMode.VIDEO -> optionsBuilder.setRunningMode(runningMode)
+
             }
 
             val options = optionsBuilder.build()
